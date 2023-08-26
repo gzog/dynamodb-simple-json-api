@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from app.routers import item, auth
+from app.middlewares.log import LogMiddleware
+
 import sentry_sdk
 
 
@@ -10,5 +12,9 @@ sentry_sdk.init(
 
 
 api = FastAPI()
+
+api.add_middleware(LogMiddleware)
+
 api.include_router(item.router)
+
 # api.include_router(auth.router)
