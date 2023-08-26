@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "kv-dynamodb-api"
+version = "0.1.0"
+description = ""
+authors = ["George Zografos <georgios@secfi.com>"]
+readme = "README.md"
+packages = [{include = "kv_dynamodb_api"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.102.0"
+uvicorn = {extras = ["standard"], version = "^0.23.2"}
+boto3 = "^1.28.35"
+sentry-sdk = {extras = ["fastapi"], version = "^1.29.2"}
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.7.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
