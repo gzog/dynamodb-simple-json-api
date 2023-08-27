@@ -7,8 +7,7 @@ jobs:
     env:
         AWS_ACCESS_KEY_ID: XXX
         AWS_SECRET_ACCESS_KEY: XXX
-        AWS_DEFAULT_REGION: test
-        ENVIRONMENT: test
+        AWS_DEFAULT_REGION: local
 
     runs-on: ubuntu-latest
 

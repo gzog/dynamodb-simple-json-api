@@ -1,5 +1,4 @@
 import boto3
-import botocore
 from app.settings import settings
 
 # For a Boto3 client.
@@ -8,12 +7,6 @@ if settings.environment == "local":
     dynamodb = boto3.client(
         "dynamodb",
         endpoint_url="http://localhost:8000",
-        region_name=settings.aws_region_name,
-    )
-elif settings.environment == "test":
-    dynamodb = boto3.client(
-        "dynamodb",
-        endpoint_url="http://127.0.0.1:8000",
         region_name=settings.aws_region_name,
     )
 else:
@@ -37,15 +30,11 @@ async def put_item(partition_key: str, sort_key: str, value: str) -> None:
 
 
 async def get_item(partition_key: str, sort_key: str) -> str | None:
-    try:
-        response = dynamodb.get_item(
-            TableName="data",
-            Key={"PK": {"S": partition_key}, "SK": {"S": sort_key}},
-        )
-    except botocore.exceptions.ClientError as e:
-        if e.response['Error']['Code'] == '404':
-            return
-    return response["Item"]["VALUE"]["S"]
+    response = dynamodb.get_item(
+        TableName="data",
+        Key={"PK": {"S": partition_key}, "SK": {"S": sort_key}},
+    )
+    return "Item" in response and response["Item"]["VALUE"]["S"]
 
 
 async def delete_item(partition_key: str, sort_key) -> bool:
