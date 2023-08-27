@@ -13,6 +13,7 @@ uvicorn = {extras = ["standard"], version = "^0.23.2"}
 boto3 = "^1.28.35"
 sentry-sdk = {extras = ["fastapi"], version = "^1.29.2"}
 httpx = "^0.24.1"
+gunicorn = "^21.2.0"
 
 
 [tool.poetry.group.dev.dependencies]
