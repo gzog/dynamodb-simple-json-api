@@ -19,7 +19,9 @@ async def create_or_update_item(key: str, payload: dict = Body(...)) -> Response
 )
 async def delete_item(key: str) -> Response:
     deleted = await item_service.delete_item(key)
-    return Response(status_code=status.HTTP_204_NO_CONTENT if deleted else status.HTTP_404_NOT_FOUND)
+    return Response(
+        status_code=status.HTTP_204_NO_CONTENT if deleted else status.HTTP_404_NOT_FOUND
+    )
 
 
 @router.get(
@@ -27,4 +29,4 @@ async def delete_item(key: str) -> Response:
 )
 async def get_item(key: str) -> JSONResponse:
     value = await item_service.get_item_value(key)
-    return JSONResponse(content=value, status_code=status.HTTP_200_OK)
+    return JSONResponse(content=value, status_code=status.HTTP_200_OK if value else status.HTTP_404_NOT_FOUND)

@@ -1,4 +1,3 @@
-
 from starlette.middleware.base import BaseHTTPMiddleware
 from app.logger import logger
 
@@ -9,8 +8,10 @@ class LogMiddleware(BaseHTTPMiddleware):
         logger.info(
             "Incoming request",
             extra={
-                "req": { "method": request.method, "url": str(request.url) },
-                "res": { "status_code": response.status_code, },
+                "req": {"method": request.method, "url": str(request.url)},
+                "res": {
+                    "status_code": response.status_code,
+                },
             },
         )
         return response

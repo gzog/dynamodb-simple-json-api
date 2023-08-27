@@ -9,9 +9,9 @@ async def create_or_update_item(key: str, payload: dict) -> None:
     await dynamodb.put_item(*get_user_item_primary_key(key), value)
 
 
-async def get_item_value(key: str) -> dict:
+async def get_item_value(key: str) -> dict | None:
     value_str = await dynamodb.get_item(*get_user_item_primary_key(key))
-    return json.loads(value_str)
+    return value_str and json.loads(value_str)
 
 
 async def delete_item(key: str) -> bool:

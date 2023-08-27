@@ -19,12 +19,12 @@ async def put_item(partition_key: str, sort_key: str, value: str) -> None:
     )
 
 
-async def get_item(partition_key: str, sort_key: str) -> str:
+async def get_item(partition_key: str, sort_key: str) -> str | None:
     response = dynamodb.get_item(
         TableName="data",
         Key={"PK": {"S": partition_key}, "SK": {"S": sort_key}},
     )
-    return response["Item"]["VALUE"]["S"]
+    return 'Item' in response and response["Item"]["VALUE"]["S"]
 
 
 async def delete_item(partition_key: str, sort_key) -> bool:
