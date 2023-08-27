@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Body, Response, status
 from fastapi.responses import JSONResponse
 from app.services import item as item_service
-from fastapi import Path
 from app.schemas import KeyPath
 
 router = APIRouter(prefix="/item")

@@ -7,6 +7,12 @@ from app.settings import settings
 if settings.environment == "local":
     dynamodb = boto3.client(
         "dynamodb",
+        endpoint_url="http://localhost:8000",
+        region_name=settings.aws_region_name,
+    )
+elif settings.environment == "test":
+    dynamodb = boto3.client(
+        "dynamodb",
         endpoint_url="http://127.0.0.1:8000",
         region_name=settings.aws_region_name,
     )

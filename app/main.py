@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from app.routers import item
+from app.middlewares.size import LimitUploadSizeMiddleware
 from app.middlewares.log import LogMiddleware
 from app.settings import settings
 import sentry_sdk
@@ -12,6 +13,8 @@ if settings.environment == "production":
     )
 
 api = FastAPI()
+
+api.add_middleware(LimitUploadSizeMiddleware, max_upload_size=128_000)  # 128KB
 api.add_middleware(LogMiddleware)
 api.include_router(item.router)
 
