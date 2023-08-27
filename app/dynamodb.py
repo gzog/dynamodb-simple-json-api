@@ -5,10 +5,8 @@ import boto3
 
 dynamodb = boto3.client(
     "dynamodb",
-    endpoint_url="http://localhost:8000",
+    endpoint_url="http://127.0.0.1:8000",
     region_name="local",
-    aws_access_key_id="",
-    aws_secret_access_key="",
 )
 
 
