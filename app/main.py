@@ -5,10 +5,11 @@ from app.settings import settings
 import sentry_sdk
 
 
-sentry_sdk.init(
-    dsn=settings.sentry_dsn,
-    traces_sample_rate=0,
-)
+if settings.environment == "production":
+    sentry_sdk.init(
+        dsn=settings.sentry_dsn,
+        traces_sample_rate=0.1,
+    )
 
 api = FastAPI()
 api.add_middleware(LogMiddleware)
