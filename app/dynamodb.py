@@ -1,4 +1,3 @@
-from typing import Any
 import boto3
 from app.settings import settings
 

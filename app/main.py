@@ -1,5 +1,4 @@
 from fastapi import FastAPI
-from functools import lru_cache
 from app.routers import item
 from app.middlewares.log import LogMiddleware
 from app.settings import settings
