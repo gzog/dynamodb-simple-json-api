@@ -4,7 +4,11 @@ import boto3
 # For a Boto3 client.
 
 dynamodb = boto3.client(
-    "dynamodb", endpoint_url="http://localhost:8000", region_name="local"
+    "dynamodb",
+    endpoint_url="http://localhost:8000",
+    region_name="local",
+    aws_access_key_id="",
+    aws_secret_access_key="",
 )
 
 
@@ -24,7 +28,7 @@ async def get_item(partition_key: str, sort_key: str) -> str | None:
         TableName="data",
         Key={"PK": {"S": partition_key}, "SK": {"S": sort_key}},
     )
-    return 'Item' in response and response["Item"]["VALUE"]["S"]
+    return "Item" in response and response["Item"]["VALUE"]["S"]
 
 
 async def delete_item(partition_key: str, sort_key) -> bool:

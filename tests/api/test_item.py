@@ -2,13 +2,12 @@ import pytest
 import httpx
 from httpx import Response
 
+
 class TestCreateOrUpdateItem:
     def test_success(self, client):
-        response : Response = client.post(
+        response: Response = client.post(
             "/item/key",
-            json={
-                "value": {"hello": "world"}
-            },
+            json={"value": {"hello": "world"}},
         )
 
         assert response.status_code == httpx.codes.CREATED
@@ -25,24 +24,18 @@ class TestCreateOrUpdateItem:
 
 class TestGetItem:
     def test_success(self, client):
-        response : Response = client.get(
-            "/item/key"
-        )
+        response: Response = client.get("/item/key")
 
         assert response.status_code == httpx.codes.OK
-        assert response.json() == {'value': {'hello': 'world'}}
+        assert response.json() == {"value": {"hello": "world"}}
 
     def test_not_found(self, client):
-        response : Response = client.get(
-            "/item/not-found-key"
-        )
+        response: Response = client.get("/item/not-found-key")
 
         assert response.status_code == httpx.codes.NOT_FOUND
 
 
-
 class TestDeleteItem:
-
     @pytest.mark.parametrize(
         ("key", "expected_http_status_code"),
         [
@@ -52,8 +45,6 @@ class TestDeleteItem:
     )
     def test_endpoint(self, client, key, expected_http_status_code):
         print(key)
-        response : Response = client.delete(
-            f"/item/{key}"
-        )
+        response: Response = client.delete(f"/item/{key}")
 
         assert response.status_code == expected_http_status_code
