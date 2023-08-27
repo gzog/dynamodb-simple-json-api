@@ -31,8 +31,6 @@ jobs:
           # Optional - x64 or x86 architecture, defaults to x64
           architecture: 'x64'
           cache: 'pip'
-
-      - name: Install dependencies
         run: pip install -r requirements.txt
 
       - name: Test with pytest
