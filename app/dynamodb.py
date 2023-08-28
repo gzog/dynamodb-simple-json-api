@@ -1,4 +1,5 @@
 import boto3
+
 from app.settings import settings
 
 # For a Boto3 client.

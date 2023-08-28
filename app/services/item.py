@@ -1,6 +1,8 @@
 import json
-from app import dynamodb
+
 from fastapi.encoders import jsonable_encoder
+
+from app import dynamodb
 
 
 async def create_or_update_item(key: str, payload: dict) -> None:

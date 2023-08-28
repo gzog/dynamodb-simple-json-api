@@ -1,9 +1,10 @@
-from fastapi import FastAPI
-from app.routers import item
-from app.middlewares.size import LimitUploadSizeMiddleware
-from app.middlewares.log import LogMiddleware
-from app.settings import settings, Environment
 import sentry_sdk
+from fastapi import FastAPI
+
+from app.middlewares.log import LogMiddleware
+from app.middlewares.size import LimitUploadSizeMiddleware
+from app.routers import item
+from app.settings import Environment, settings
 
 if settings.environment == Environment.Production:
     sentry_sdk.init(
