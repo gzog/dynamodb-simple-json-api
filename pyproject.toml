@@ -23,6 +23,7 @@ pytest = "^7.4.0"
 pytest-cov = "^4.1.0"
 flake8 = "^6.1.0"
 pre-commit = "^3.3.3"
+mypy = "^1.5.1"
 
 [build-system]
 requires = ["poetry-core"]
@@ -44,3 +45,10 @@ exclude = '''
   | dist
 )/
 '''
+
+[tool.mypy]
+ignore_missing_imports = true
+exclude = [
+    ".venv",
+    "^test",
+]

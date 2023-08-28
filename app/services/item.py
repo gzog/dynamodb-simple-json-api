@@ -11,14 +11,14 @@ async def create_or_update_item(key: str, payload: dict) -> None:
 
 async def get_item_value(key: str) -> dict | None:
     value_str = await dynamodb.get_item(*get_user_item_primary_key(key))
-    return value_str and json.loads(value_str)
+    return json.loads(value_str) if value_str else None
 
 
 async def delete_item(key: str) -> bool:
     return await dynamodb.delete_item(*get_user_item_primary_key(key))
 
 
-def get_user_item_primary_key(key: str):
+def get_user_item_primary_key(key: str) -> tuple[str, str]:
     partition_key = f"USER#1#KEY#{key}"
     sort_key = f"USER#1#KEY#{key}"
     return partition_key, sort_key

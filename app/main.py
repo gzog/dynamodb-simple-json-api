@@ -19,3 +19,5 @@ api.add_middleware(LogMiddleware)
 api.include_router(item.router)
 
 # api.include_router(auth.router)
+
+print("dasdad")
