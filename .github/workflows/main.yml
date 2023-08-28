@@ -3,7 +3,7 @@ name: Workflow
 on: [push]
 
 jobs:
-  build:
+  test:
     env:
         AWS_ACCESS_KEY_ID: XXX
         AWS_SECRET_ACCESS_KEY: XXX
@@ -45,3 +45,13 @@ jobs:
         with:
           name: pytest-coverage-report
           path: reports/pytest/
+
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to Digital Ocean
+        uses: digitalocean/app_action@v1.1.5
+        with:
+          app_name: hammerhead-app
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}

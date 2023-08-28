@@ -1,3 +1,4 @@
+from enum import Enum
 from functools import lru_cache
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field
@@ -21,3 +22,8 @@ def get_settings() -> Settings:
 
 
 settings = get_settings()
+
+
+class Environment(str, Enum):
+    Production = "production"
+    Local = "local"
