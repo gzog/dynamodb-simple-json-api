@@ -1,4 +1,4 @@
-from app.aws import dynamodb
+from app.utils.aws import dynamodb
 
 
 async def put_item(partition_key: str, sort_key: str, value: str) -> None:
