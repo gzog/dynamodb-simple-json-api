@@ -1,6 +1,6 @@
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from app.logger import logger
+from app.utils.logger import logger
 
 
 class LogMiddleware(BaseHTTPMiddleware):
