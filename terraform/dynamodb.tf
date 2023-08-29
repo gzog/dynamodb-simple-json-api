@@ -1,4 +1,6 @@
 module "dynamodb_table" {
+  source   = "terraform-aws-modules/dynamodb-table/aws"
+
   name                        = "data"
   hash_key                    = "PK"
   range_key                   = "SK"

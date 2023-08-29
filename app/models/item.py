@@ -1,22 +1,4 @@
-import boto3
-
-from app.settings import settings
-
-# For a Boto3 client.
-
-if settings.environment == "local":
-    dynamodb = boto3.client(
-        "dynamodb",
-        endpoint_url="http://localhost:8000",
-        region_name=settings.aws_region_name,
-    )
-else:
-    dynamodb = boto3.client(
-        "dynamodb",
-        aws_access_key_id=settings.aws_access_key_id,
-        aws_secret_access_key=settings.aws_secret_access_key,
-        region_name=settings.aws_region_name,
-    )
+from app.aws import dynamodb
 
 
 async def put_item(partition_key: str, sort_key: str, value: str) -> None:
