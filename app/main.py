@@ -20,9 +20,3 @@ api.add_middleware(LogMiddleware)
 api.include_router(item.router)
 
 # api.include_router(auth.router)
-
-print("dasdad")
-
-
-# PK,SK,VALUE
-# USER#{USER}, API_KEY, {"enabled": true, "user": 1234, }
