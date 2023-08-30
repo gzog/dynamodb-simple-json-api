@@ -32,7 +32,10 @@ async def delete_item(key: str = KeyPath) -> Response:
 )
 async def get_item(key: str = KeyPath) -> JSONResponse:
     value = await item_service.get_item_value(key)
+
     return JSONResponse(
         content=value,
-        status_code=status.HTTP_200_OK if value else status.HTTP_404_NOT_FOUND,
+        status_code=status.HTTP_200_OK
+        if value is not None
+        else status.HTTP_404_NOT_FOUND,
     )
