@@ -1,7 +1,5 @@
-from typing import Callable
-
 from starlette import status
-from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.requests import Request
 from starlette.responses import Response
 
@@ -9,7 +7,9 @@ from app.settings import settings
 
 
 class AuthMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next: Callable) -> Response:
+    async def dispatch(
+        self, request: Request, call_next: RequestResponseEndpoint
+    ) -> Response:
         auth = request.headers.get("Authorization")
         if not auth:
             return Response(status_code=status.HTTP_401_UNAUTHORIZED)

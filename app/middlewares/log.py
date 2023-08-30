@@ -1,13 +1,11 @@
-from typing import Callable
-
 from fastapi import Request
-from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 
 from app.utils.logger import logger
 
 
 class LogMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next: Callable):
+    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint):
         response = await call_next(request)
         logger.info(
             "http",

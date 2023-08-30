@@ -1,9 +1,9 @@
 from collections import defaultdict
 from time import time
-from typing import Callable
 
 from fastapi import Request, Response
-from starlette.middleware.base import BaseHTTPMiddleware
+from starlette import status
+from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.types import ASGIApp
 
 
@@ -14,7 +14,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         self.time_interval = time_interval
         self.clients: defaultdict[str, list[float]] = defaultdict(list[float])
 
-    async def dispatch(self, request: Request, call_next: Callable):
+    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint):
         client_ip = request.client.host
         current_time = time()
 
@@ -26,7 +26,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             ]
 
         if len(self.clients[client_ip]) >= self.rate_limit:
-            return Response(status_code=429)
+            return Response(status_code=status.HTTP_429_TOO_MANY_REQUESTS)
         else:
             self.clients[client_ip].append(current_time)
 
