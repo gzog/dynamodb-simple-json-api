@@ -17,7 +17,7 @@ if settings.environment == Environment.Production:
 
 api = FastAPI()
 
-api.add_middleware(RateLimitMiddleware, rate_limit=5, time_interval=60)  # 5 res / sec
+api.add_middleware(RateLimitMiddleware, rate_limit=5, time_interval=1)  # 5 res / sec
 api.add_middleware(LimitUploadSizeMiddleware, max_upload_size=128_000)  # 128KB
 api.add_middleware(LogMiddleware)
 
