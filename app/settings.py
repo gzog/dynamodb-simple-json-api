@@ -14,6 +14,8 @@ class Settings(BaseSettings):
     aws_secret_access_key: str = Field(..., env="aws_secret_access_key")
     aws_region_name: str = Field(..., env="region_name")
 
+    api_key: str = Field(..., env="api_key")
+
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
 

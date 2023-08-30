@@ -4,10 +4,11 @@ from typing import Callable
 
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.types import ASGIApp
 
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
-    def __init__(self, app, rate_limit: int = 5, time_interval: int = 60):
+    def __init__(self, app: ASGIApp, rate_limit: int = 5, time_interval: int = 60):
         super().__init__(app)
         self.rate_limit = rate_limit
         self.time_interval = time_interval
