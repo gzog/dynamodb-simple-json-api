@@ -56,5 +56,5 @@ jobs:
       - name: Deploy to Digital Ocean
         uses: digitalocean/app_action@v1.1.5
         with:
-          app_name: hammerhead-app
+          app_name: clownfish-app
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
