@@ -14,8 +14,12 @@ class AuthMiddleware(BaseHTTPMiddleware):
         if not auth:
             return Response(status_code=status.HTTP_401_UNAUTHORIZED)
 
-        token = auth.replace("Bearer ", "")
-        if token != settings.api_key:
+        api_key = auth.replace("Bearer ", "")
+
+        # TODO: Support additional api keys
+        if api_key != settings.api_key:
             return Response(status_code=status.HTTP_403_FORBIDDEN)
+
+        request.state.api_key = api_key
 
         return await call_next(request)

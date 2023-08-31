@@ -1,8 +1,7 @@
 from app.utils.aws import dynamodb
 
 
-async def put_api_key(item_key: str, value: str) -> None:
-    partition_key, sort_key = get_item_primary_key(item_key)
+def create_or_update(partition_key: str, sort_key: str, value: str) -> None:
     dynamodb.put_item(
         TableName="data",
         Item={
@@ -13,8 +12,7 @@ async def put_api_key(item_key: str, value: str) -> None:
     )
 
 
-async def get_api_key(item_key: str) -> str | None:
-    partition_key, sort_key = get_item_primary_key(item_key)
+def get(partition_key: str, sort_key: str) -> str | None:
     response = dynamodb.get_item(
         TableName="data",
         Key={"PK": {"S": partition_key}, "SK": {"S": sort_key}},
@@ -22,8 +20,7 @@ async def get_api_key(item_key: str) -> str | None:
     return response["Item"]["VALUE"]["S"] if "Item" in response else None
 
 
-async def delete_api_key(item_key: str) -> bool:
-    partition_key, sort_key = get_item_primary_key(item_key)
+def delete(partition_key: str, sort_key: str) -> bool:
     response = dynamodb.delete_item(
         TableName="data",
         Key={"PK": {"S": partition_key}, "SK": {"S": sort_key}},
@@ -33,9 +30,3 @@ async def delete_api_key(item_key: str) -> bool:
     # The "delete_item" operation is idempotent.
     # This is a trick to check if an item is deleted or not
     return "Attributes" in response
-
-
-def get_item_primary_key(key: str) -> tuple[str, str]:
-    partition_key = f"API_KEY#{key}"
-    sort_key = "USER#USER_1"
-    return partition_key, sort_key
