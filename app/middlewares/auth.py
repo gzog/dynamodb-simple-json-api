@@ -10,6 +10,12 @@ class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(
         self, request: Request, call_next: RequestResponseEndpoint
     ) -> Response:
+        # TODO: Add list of ignored paths here
+        path = request.scope["path"]
+
+        if path in ["/docs", "/openapi.json"]:
+            return await call_next(request)
+
         auth = request.headers.get("Authorization")
         if not auth:
             return Response(status_code=status.HTTP_401_UNAUTHORIZED)
