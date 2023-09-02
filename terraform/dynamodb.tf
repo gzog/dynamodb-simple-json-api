@@ -15,10 +15,6 @@ module "dynamodb_table" {
     {
       name = "SK"
       type = "S"
-    },
-    {
-      name = "VALUE"
-      type = "S"
     }
   ]
 

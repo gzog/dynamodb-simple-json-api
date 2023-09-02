@@ -7,6 +7,6 @@ terraform {
 }
     
 provider "aws" {
-  region = "eu-west-1"
-  shared_credentials_files = ["$HOME/.aws/credentials_personal"]
+  region  = "eu-west-1"
+  profile = "dynamodb-simple-json-api"
 }
