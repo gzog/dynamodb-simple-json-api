@@ -27,4 +27,7 @@ module "dynamodb_table" {
     Terraform   = "true"
     Environment = "production"
   }
+
+  ttl_attribute_name            = "TTL"
+  ttl_enabled                   = true
 }
