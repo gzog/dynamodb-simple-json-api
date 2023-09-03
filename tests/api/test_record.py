@@ -90,8 +90,7 @@ class TestGetRecord:
     def test_get_record_with_expired_ttl(self, client: TestClient):
         response: Response = client.get("/record/key-expired-ttl")
 
-        assert response.status_code == httpx.codes.OK
-        assert response.json() == {"value": {"hello": "world"}}
+        assert response.status_code == httpx.codes.NOT_FOUND
 
     def test_get_record_does_not_exist(self, client):
         response: Response = client.get("/record/key-not-found")
@@ -110,7 +109,7 @@ class TestDeleteRecord:
 
     def test_delete_existing_record_with_expired_ttl(self, client: TestClient):
         response: Response = client.delete("/record/key-expired-ttl")
-        assert response.status_code == httpx.codes.NO_CONTENT
+        assert response.status_code == httpx.codes.NOT_FOUND
 
     def test_delete_not_found_record(self, client: TestClient):
         response: Response = client.delete("/record/key-not-found")
