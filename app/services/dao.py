@@ -20,7 +20,17 @@ def get(partition_key: str, sort_key: str) -> str | None:
         TableName="data",
         Key={"PK": {"S": partition_key}, "SK": {"S": sort_key}},
     )
-    return response["Item"]["VALUE"]["S"] if "Item" in response else None
+
+    if "Item" not in response:
+        return None
+
+    item = response["Item"]["VALUE"]["S"]
+    ttl = response["Item"].get("TTL")
+
+    if ttl:
+        pass
+
+    return item
 
 
 def delete(partition_key: str, sort_key: str) -> bool:
@@ -32,4 +42,14 @@ def delete(partition_key: str, sort_key: str) -> bool:
 
     # The "delete_item" operation is idempotent.
     # This is a trick to check if an item is deleted or not
-    return "Attributes" in response
+    if "Attributes" not in response:
+        return False
+
+    attributes = response["Attributes"]
+
+    ttl = attributes.get("TTL")
+
+    if ttl:
+        pass
+
+    return True

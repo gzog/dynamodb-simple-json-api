@@ -1,7 +1,6 @@
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 import httpx
-import pytest
 from httpx import Response
 from fastapi.testclient import TestClient
 
@@ -19,7 +18,7 @@ class TestCreateOrUpdateRecord:
         ttl = int((datetime.utcnow() + relativedelta(seconds=60)).timestamp())
 
         response: Response = client.post(
-            f"/record/key_ttl?ttl={ttl}",
+            f"/record/key-valid-ttl?ttl={ttl}",
             json={"value": {"hello": "world"}},
         )
 
@@ -29,7 +28,7 @@ class TestCreateOrUpdateRecord:
         ttl = int((datetime.utcnow() - relativedelta(seconds=60)).timestamp())
 
         response: Response = client.post(
-            f"/record/key_ttl?ttl={ttl}",
+            f"/record/key-expired-ttl?ttl={ttl}",
             json={"value": {"hello": "world"}},
         )
 
@@ -37,7 +36,7 @@ class TestCreateOrUpdateRecord:
 
     def test_invalid_key(self, client: TestClient):
         response: Response = client.post(
-            "/record/@.!@#$%'",
+            "/record/key-record-@.!@#$%'",
             json={"value": {"hello": "world"}},
         )
 
@@ -47,9 +46,9 @@ class TestCreateOrUpdateRecord:
                 {
                     "type": "string_pattern_mismatch",
                     "loc": ["path", "key"],
-                    "msg": "String should match pattern '[a-z0-9-]+'",
-                    "input": "@.!@",
-                    "ctx": {"pattern": "[a-z0-9-]+"},
+                    "msg": "String should match pattern '^[a-z0-9-]+$'",
+                    "input": "key-record-@.!@",
+                    "ctx": {"pattern": "^[a-z0-9-]+$"},
                     "url": "https://errors.pydantic.dev/2.3/v/string_pattern_mismatch",
                 }
             ]
@@ -57,7 +56,7 @@ class TestCreateOrUpdateRecord:
 
     def test_invalid_payload(self, client: TestClient):
         response: Response = client.post(
-            "/record/invalid_payload",
+            "/record/key-invalid-payload",
             content="bla",
         )
 
@@ -76,27 +75,43 @@ class TestCreateOrUpdateRecord:
 
 
 class TestGetRecord:
-    def test_success(self, client: TestClient):
+    def test_get_record_without_ttl(self, client: TestClient):
         response: Response = client.get("/record/key")
 
         assert response.status_code == httpx.codes.OK
         assert response.json() == {"value": {"hello": "world"}}
 
-    def test_not_found(self, client):
-        response: Response = client.get("/record/not-found-key")
+    def test_get_record_with_non_expired_ttl(self, client: TestClient):
+        response: Response = client.get("/record/key-valid-ttl")
+
+        assert response.status_code == httpx.codes.OK
+        assert response.json() == {"value": {"hello": "world"}}
+
+    def test_get_record_with_expired_ttl(self, client: TestClient):
+        response: Response = client.get("/record/key-expired-ttl")
+
+        assert response.status_code == httpx.codes.OK
+        assert response.json() == {"value": {"hello": "world"}}
+
+    def test_get_record_does_not_exist(self, client):
+        response: Response = client.get("/record/key-not-found")
 
         assert response.status_code == httpx.codes.NOT_FOUND
 
 
 class TestDeleteRecord:
-    @pytest.mark.parametrize(
-        ("key", "expected_http_status_code"),
-        [
-            ("key", httpx.codes.NO_CONTENT),
-            ("not-found-key", httpx.codes.NOT_FOUND),
-        ],
-    )
-    def test_endpoint(self, client: TestClient, key: str, expected_http_status_code: int):
-        response: Response = client.delete(f"/record/{key}")
+    def test_delete_existing_record(self, client: TestClient):
+        response: Response = client.delete("/record/key")
+        assert response.status_code == httpx.codes.NO_CONTENT
 
-        assert response.status_code == expected_http_status_code
+    def test_delete_existing_record_with_valid_ttl(self, client: TestClient):
+        response: Response = client.delete("/record/key-valid-ttl")
+        assert response.status_code == httpx.codes.NO_CONTENT
+
+    def test_delete_existing_record_with_expired_ttl(self, client: TestClient):
+        response: Response = client.delete("/record/key-expired-ttl")
+        assert response.status_code == httpx.codes.NO_CONTENT
+
+    def test_delete_not_found_record(self, client: TestClient):
+        response: Response = client.delete("/record/key-not-found")
+        assert response.status_code == httpx.codes.NOT_FOUND
