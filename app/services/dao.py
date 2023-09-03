@@ -7,7 +7,7 @@ def create_or_update(
     item = {"PK": {"S": partition_key}, "SK": {"S": sort_key}, "VALUE": {"S": value}}
 
     if ttl:
-        item["TTL"] = {"TTL": {"N": ttl}}  # type: ignore
+        item["TTL"] = {"N": str(ttl)}
 
     dynamodb.put_item(
         TableName="data",

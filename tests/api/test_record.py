@@ -1,3 +1,5 @@
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 import httpx
 import pytest
 from httpx import Response
@@ -5,7 +7,7 @@ from fastapi.testclient import TestClient
 
 
 class TestCreateOrUpdateRecord:
-    def test_success(self, client: TestClient):
+    def test_create_without_ttl(self, client: TestClient):
         response: Response = client.post(
             "/record/key",
             json={"value": {"hello": "world"}},
@@ -13,14 +15,64 @@ class TestCreateOrUpdateRecord:
 
         assert response.status_code == httpx.codes.CREATED
 
-    def test_invalid_key(self, client):
-        ...
+    def test_create_with_valid_ttl(self, client: TestClient):
+        ttl = int((datetime.utcnow() + relativedelta(seconds=60)).timestamp())
 
-    def test_invalid_payload(self, client):
-        ...
+        response: Response = client.post(
+            f"/record/key_ttl?ttl={ttl}",
+            json={"value": {"hello": "world"}},
+        )
 
-    def test_invalid_user(self, client):
-        ...
+        assert response.status_code == httpx.codes.CREATED
+
+    def test_create_with_invalid_ttl(self, client: TestClient):
+        ttl = int((datetime.utcnow() - relativedelta(seconds=60)).timestamp())
+
+        response: Response = client.post(
+            f"/record/key_ttl?ttl={ttl}",
+            json={"value": {"hello": "world"}},
+        )
+
+        assert response.status_code == httpx.codes.CREATED
+
+    def test_invalid_key(self, client: TestClient):
+        response: Response = client.post(
+            "/record/@.!@#$%'",
+            json={"value": {"hello": "world"}},
+        )
+
+        assert response.status_code == httpx.codes.UNPROCESSABLE_ENTITY
+        assert response.json() == {
+            "detail": [
+                {
+                    "type": "string_pattern_mismatch",
+                    "loc": ["path", "key"],
+                    "msg": "String should match pattern '[a-z0-9-]+'",
+                    "input": "@.!@",
+                    "ctx": {"pattern": "[a-z0-9-]+"},
+                    "url": "https://errors.pydantic.dev/2.3/v/string_pattern_mismatch",
+                }
+            ]
+        }
+
+    def test_invalid_payload(self, client: TestClient):
+        response: Response = client.post(
+            "/record/invalid_payload",
+            content="bla",
+        )
+
+        assert response.status_code == httpx.codes.UNPROCESSABLE_ENTITY
+        assert response.json() == {
+            "detail": [
+                {
+                    "type": "json_invalid",
+                    "loc": ["body", 0],
+                    "msg": "JSON decode error",
+                    "input": {},
+                    "ctx": {"error": "Expecting value"},
+                }
+            ]
+        }
 
 
 class TestGetRecord:
