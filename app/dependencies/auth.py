@@ -6,7 +6,10 @@ from starlette.status import HTTP_403_FORBIDDEN
 
 class HTTPBearerAPIKey(HTTPBearer):
     async def __call__(self, request: Request) -> HTTPAuthorizationCredentials | None:
-        result: HTTPAuthorizationCredentials = await super().__call__(request)
+        result: HTTPAuthorizationCredentials | None = await super().__call__(request)
+
+        if not result:
+            return None
 
         if result.credentials != settings.api_key:
             raise HTTPException(

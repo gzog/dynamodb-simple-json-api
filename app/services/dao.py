@@ -4,10 +4,14 @@ from app.utils.aws import dynamodb
 def create_or_update(
     partition_key: str, sort_key: str, value: str, ttl: int | None
 ) -> None:
+    item = {"PK": {"S": partition_key}, "SK": {"S": sort_key}, "VALUE": {"S": value}}
+
+    if ttl:
+        item["TTL"] = {"TTL": {"N": ttl}}  # type: ignore
+
     dynamodb.put_item(
         TableName="data",
-        Item={"PK": {"S": partition_key}, "SK": {"S": sort_key}, "VALUE": {"S": value}}
-        | ({"TTL": {"N": ttl}} if ttl else {}),
+        Item=item,
     )
 
 
