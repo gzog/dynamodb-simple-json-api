@@ -14,7 +14,7 @@ bearer = HTTPBearerAPIKey()
 @router.get(
     "/keys",
 )
-async def yolo(
+async def get_record_keys(
     credentials: HTTPAuthorizationCredentials = Security(bearer),
 ) -> JSONResponse:
     keys = await record_service.get_record_keys(credentials.credentials)
