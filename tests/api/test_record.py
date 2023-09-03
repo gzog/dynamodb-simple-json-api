@@ -1,6 +1,6 @@
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-import httpx
+from fastapi import status
 from httpx import Response
 from fastapi.testclient import TestClient
 
@@ -12,7 +12,7 @@ class TestCreateOrUpdateRecord:
             json={"value": {"hello": "world"}},
         )
 
-        assert response.status_code == httpx.codes.CREATED
+        assert response.status_code == status.HTTP_201_CREATED
 
     def test_create_with_valid_ttl(self, client: TestClient):
         ttl = int((datetime.utcnow() + relativedelta(seconds=60)).timestamp())
@@ -22,7 +22,7 @@ class TestCreateOrUpdateRecord:
             json={"value": {"hello": "world"}},
         )
 
-        assert response.status_code == httpx.codes.CREATED
+        assert response.status_code == status.HTTP_201_CREATED
 
     def test_create_with_invalid_ttl(self, client: TestClient):
         ttl = int((datetime.utcnow() - relativedelta(seconds=60)).timestamp())
@@ -32,7 +32,7 @@ class TestCreateOrUpdateRecord:
             json={"value": {"hello": "world"}},
         )
 
-        assert response.status_code == httpx.codes.CREATED
+        assert response.status_code == status.HTTP_201_CREATED
 
     def test_invalid_key(self, client: TestClient):
         response: Response = client.post(
@@ -40,7 +40,7 @@ class TestCreateOrUpdateRecord:
             json={"value": {"hello": "world"}},
         )
 
-        assert response.status_code == httpx.codes.UNPROCESSABLE_ENTITY
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
         assert response.json() == {
             "detail": [
                 {
@@ -60,7 +60,7 @@ class TestCreateOrUpdateRecord:
             content="bla",
         )
 
-        assert response.status_code == httpx.codes.UNPROCESSABLE_ENTITY
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
         assert response.json() == {
             "detail": [
                 {
@@ -78,39 +78,47 @@ class TestGetRecord:
     def test_get_record_without_ttl(self, client: TestClient):
         response: Response = client.get("/record/key")
 
-        assert response.status_code == httpx.codes.OK
+        assert response.status_code == status.HTTP_200_OK
         assert response.json() == {"value": {"hello": "world"}}
 
     def test_get_record_with_non_expired_ttl(self, client: TestClient):
         response: Response = client.get("/record/key-valid-ttl")
 
-        assert response.status_code == httpx.codes.OK
+        assert response.status_code == status.HTTP_200_OK
         assert response.json() == {"value": {"hello": "world"}}
 
     def test_get_record_with_expired_ttl(self, client: TestClient):
         response: Response = client.get("/record/key-expired-ttl")
 
-        assert response.status_code == httpx.codes.NOT_FOUND
+        assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_get_record_does_not_exist(self, client):
         response: Response = client.get("/record/key-not-found")
 
-        assert response.status_code == httpx.codes.NOT_FOUND
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+class TestGetRecordKeys:
+    def test_get_record_keys(self, client: TestClient):
+        response: Response = client.get("/record/keys")
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == ["KEY#key", "KEY#key-valid-ttl"]
 
 
 class TestDeleteRecord:
     def test_delete_existing_record(self, client: TestClient):
         response: Response = client.delete("/record/key")
-        assert response.status_code == httpx.codes.NO_CONTENT
+        assert response.status_code == status.HTTP_204_NO_CONTENT
 
     def test_delete_existing_record_with_valid_ttl(self, client: TestClient):
         response: Response = client.delete("/record/key-valid-ttl")
-        assert response.status_code == httpx.codes.NO_CONTENT
+        assert response.status_code == status.HTTP_204_NO_CONTENT
 
     def test_delete_existing_record_with_expired_ttl(self, client: TestClient):
         response: Response = client.delete("/record/key-expired-ttl")
-        assert response.status_code == httpx.codes.NOT_FOUND
+        assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    def test_delete_not_found_record(self, client: TestClient):
+    def test_delete_HTTP_404_NOT_FOUND_record(self, client: TestClient):
         response: Response = client.delete("/record/key-not-found")
-        assert response.status_code == httpx.codes.NOT_FOUND
+        assert response.status_code == status.HTTP_404_NOT_FOUND

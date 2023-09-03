@@ -22,7 +22,17 @@ async def delete_record(api_key: str, key: str) -> bool:
     return dao.delete(*get_primary_key(api_key, key))
 
 
+async def get_record_keys(api_key: str) -> list[str]:
+    return dao.get_sort_keys(get_partition_key(api_key))
+
+
 def get_primary_key(api_key: str, key: str) -> tuple[str, str]:
-    partition_key = f"API_KEY{api_key}#KEY#{key}"
-    sort_key = f"API_KEY{api_key}#KEY#{key}"
-    return partition_key, sort_key
+    return get_partition_key(api_key), get_sort_key(key)
+
+
+def get_partition_key(api_key: str) -> str:
+    return f"API_KEY{api_key}"
+
+
+def get_sort_key(key: str) -> str:
+    return f"KEY#{key}"

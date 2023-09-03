@@ -3,7 +3,6 @@ from fastapi import FastAPI, Request, Response
 from starlette import status
 
 from app.exceptions import RateLimitExceeded
-from app.middlewares.auth import AuthMiddleware
 from app.middlewares.log import LogMiddleware
 from app.middlewares.rate_limit import RateLimitMiddleware
 from app.middlewares.size import LimitUploadSizeMiddleware
@@ -18,7 +17,6 @@ if settings.environment == Environment.Production:
 
 api = FastAPI()
 
-api.add_middleware(AuthMiddleware)
 api.add_middleware(
     RateLimitMiddleware, rate_limit=60, time_interval=1
 )  # 60 requests / sec
@@ -27,8 +25,6 @@ api.add_middleware(LogMiddleware)
 
 
 api.include_router(record.router)
-
-# api.include_router(auth.router)
 
 
 @api.exception_handler(RateLimitExceeded)

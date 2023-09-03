@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     aws_access_key_id: str = Field(..., env="aws_access_key_id")
     aws_secret_access_key: str = Field(..., env="aws_secret_access_key")
     aws_region_name: str = Field(..., env="region_name")
+    aws_dynamodb_table_name: str = Field(..., env="aws_dynamodb_table_name")
 
     api_key: str = Field(..., env="api_key")
 
