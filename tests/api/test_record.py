@@ -6,38 +6,38 @@ from fastapi.testclient import TestClient
 
 
 class TestCreateOrUpdateRecord:
-    def test_create_without_ttl(self, client: TestClient):
+    def test_create_record_without_ttl(self, client: TestClient):
         response: Response = client.post(
             "/record/key",
-            json={"value": {"hello": "world"}},
+            json={"hello": "world"},
         )
 
         assert response.status_code == status.HTTP_201_CREATED
 
-    def test_create_with_valid_ttl(self, client: TestClient):
+    def test_create_record_with_valid_ttl(self, client: TestClient):
         ttl = int((datetime.utcnow() + relativedelta(seconds=60)).timestamp())
 
         response: Response = client.post(
             f"/record/key-valid-ttl?ttl={ttl}",
-            json={"value": {"hello": "world"}},
+            json={"hello": "world"},
         )
 
         assert response.status_code == status.HTTP_201_CREATED
 
-    def test_create_with_invalid_ttl(self, client: TestClient):
+    def test_create_record_with_invalid_ttl(self, client: TestClient):
         ttl = int((datetime.utcnow() - relativedelta(seconds=60)).timestamp())
 
         response: Response = client.post(
             f"/record/key-expired-ttl?ttl={ttl}",
-            json={"value": {"hello": "world"}},
+            json={"hello": "world"},
         )
 
         assert response.status_code == status.HTTP_201_CREATED
 
-    def test_invalid_key(self, client: TestClient):
+    def test_create_record_with_invalid_key(self, client: TestClient):
         response: Response = client.post(
             "/record/key-record-@.!@#$%'",
-            json={"value": {"hello": "world"}},
+            json={"hello": "world"},
         )
 
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
@@ -54,7 +54,7 @@ class TestCreateOrUpdateRecord:
             ]
         }
 
-    def test_invalid_payload(self, client: TestClient):
+    def test_create_record_with_invalid_payload(self, client: TestClient):
         response: Response = client.post(
             "/record/key-invalid-payload",
             content="bla",
@@ -79,13 +79,13 @@ class TestGetRecord:
         response: Response = client.get("/record/key")
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.json() == {"value": {"hello": "world"}}
+        assert response.json() == {"hello": "world"}
 
     def test_get_record_with_non_expired_ttl(self, client: TestClient):
         response: Response = client.get("/record/key-valid-ttl")
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.json() == {"value": {"hello": "world"}}
+        assert response.json() == {"hello": "world"}
 
     def test_get_record_with_expired_ttl(self, client: TestClient):
         response: Response = client.get("/record/key-expired-ttl")
@@ -100,10 +100,18 @@ class TestGetRecord:
 
 class TestGetRecordKeys:
     def test_get_record_keys(self, client: TestClient):
-        response: Response = client.get("/record/keys")
+        response: Response = client.get("/records/keys")
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == ["KEY#key", "KEY#key-valid-ttl"]
+
+
+class TestGetRecords:
+    def test_get_records(self, client: TestClient):
+        response: Response = client.get("/records")
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == [{"hello": "world"}, {"hello": "world"}]
 
 
 class TestDeleteRecord:

@@ -69,6 +69,22 @@ def get_sort_keys(partition_key: str) -> list[str]:
     return [elem["SK"]["S"] for elem in response["Items"]]
 
 
+def get_sort_values(partition_key: str) -> list[str]:
+    response = dynamodb.query(
+        TableName=settings.aws_dynamodb_table_name,
+        KeyConditionExpression="PK = :PK",
+        ProjectionExpression="#VALUE",
+        FilterExpression="attribute_not_exists(#TTL) or #TTL >= :ttl",
+        ExpressionAttributeNames={"#TTL": "TTL", "#VALUE": "VALUE"},
+        ExpressionAttributeValues={
+            ":PK": {"S": partition_key},
+            ":ttl": {"N": str(get_current_timestamp())},
+        },
+    )
+
+    return [elem["VALUE"]["S"] for elem in response["Items"]]
+
+
 def _is_expired(ttl: int):
     return ttl < get_current_timestamp()
 

@@ -6,7 +6,7 @@ from app.exceptions import RateLimitExceeded
 from app.middlewares.log import LogMiddleware
 from app.middlewares.rate_limit import RateLimitMiddleware
 from app.middlewares.size import LimitUploadSizeMiddleware
-from app.routers import record
+from app.routers.record import record_router, records_router
 from app.settings import Environment, settings
 
 if settings.environment == Environment.Production:
@@ -23,8 +23,8 @@ api.add_middleware(
 api.add_middleware(LimitUploadSizeMiddleware, max_upload_size=400_000)  # 400KB
 api.add_middleware(LogMiddleware)
 
-
-api.include_router(record.router)
+api.include_router(records_router)
+api.include_router(record_router)
 
 
 @api.exception_handler(RateLimitExceeded)

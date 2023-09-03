@@ -6,12 +6,13 @@ from app.routers.schemas import KeyPath
 from app.dependencies.auth import HTTPBearerAPIKey
 from app.services import record as record_service
 
-router = APIRouter(prefix="/record")
+record_router = APIRouter(prefix="/record")
+records_router = APIRouter(prefix="/records")
 
 bearer = HTTPBearerAPIKey()
 
 
-@router.get(
+@records_router.get(
     "/keys",
 )
 async def get_record_keys(
@@ -24,7 +25,20 @@ async def get_record_keys(
     )
 
 
-@router.post(
+@records_router.get(
+    "",
+)
+async def get_records(
+    credentials: HTTPAuthorizationCredentials = Security(bearer),
+) -> JSONResponse:
+    records = await record_service.get_records(credentials.credentials)
+    return JSONResponse(
+        content=records,
+        status_code=status.HTTP_200_OK,
+    )
+
+
+@record_router.post(
     "/{key}",
 )
 async def create_or_update_record(
@@ -39,7 +53,7 @@ async def create_or_update_record(
     return Response(status_code=status.HTTP_201_CREATED)
 
 
-@router.delete(
+@record_router.delete(
     "/{key}",
 )
 async def delete_record(
@@ -51,7 +65,7 @@ async def delete_record(
     )
 
 
-@router.get(
+@record_router.get(
     "/{key}",
 )
 async def get_record(

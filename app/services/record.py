@@ -26,12 +26,17 @@ async def get_record_keys(api_key: str) -> list[str]:
     return dao.get_sort_keys(get_partition_key(api_key))
 
 
+async def get_records(api_key: str) -> list[dict]:
+    value_strs = dao.get_sort_values(get_partition_key(api_key))
+    return [json.loads(value_str) for value_str in value_strs]
+
+
 def get_primary_key(api_key: str, key: str) -> tuple[str, str]:
     return get_partition_key(api_key), get_sort_key(key)
 
 
 def get_partition_key(api_key: str) -> str:
-    return f"API_KEY{api_key}"
+    return f"API_KEY#{api_key}"
 
 
 def get_sort_key(key: str) -> str:
