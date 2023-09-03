@@ -5,10 +5,12 @@ from fastapi.encoders import jsonable_encoder
 from app.services import dao
 
 
-async def create_or_update_record(api_key: str, key: str, payload: dict) -> None:
+async def create_or_update_record(
+    api_key: str, key: str, payload: dict, ttl: int | None
+) -> None:
     jsonable_payload = jsonable_encoder(payload)
     value = json.dumps(jsonable_payload)
-    dao.create_or_update(*get_primary_key(api_key, key), value)
+    dao.create_or_update(*get_primary_key(api_key, key), value, ttl)
 
 
 async def get_record_value(api_key: str, key: str) -> dict | None:

@@ -18,8 +18,11 @@ async def create_or_update_record(
     credentials: HTTPAuthorizationCredentials = Security(bearer),
     key: str = KeyPath,
     payload: dict = Body(...),
+    ttl: int | None = None,
 ) -> Response:
-    await record_service.create_or_update_record(credentials.credentials, key, payload)
+    await record_service.create_or_update_record(
+        credentials.credentials, key, payload, ttl
+    )
     return Response(status_code=status.HTTP_201_CREATED)
 
 
