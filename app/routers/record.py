@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Body, Response, status
 from fastapi.responses import JSONResponse
 from fastapi import Security
-from fastapi.security.http import HTTPAuthorizationCredentials
+from app.dependencies.auth import HTTPAuthorizationCredentialsWithUser
 from app.routers.schemas import KeyPath
 from app.dependencies.auth import HTTPBearerAPIKey
 from app.services import record as record_service
@@ -16,9 +16,9 @@ bearer = HTTPBearerAPIKey()
     "/keys",
 )
 async def get_record_keys(
-    credentials: HTTPAuthorizationCredentials = Security(bearer),
+    credentials: HTTPAuthorizationCredentialsWithUser = Security(bearer),
 ) -> JSONResponse:
-    keys = await record_service.get_record_keys(credentials.credentials)
+    keys = await record_service.get_record_keys(credentials.user["id"])
     return JSONResponse(
         content=keys,
         status_code=status.HTTP_200_OK,
@@ -29,9 +29,9 @@ async def get_record_keys(
     "",
 )
 async def get_records(
-    credentials: HTTPAuthorizationCredentials = Security(bearer),
+    credentials: HTTPAuthorizationCredentialsWithUser = Security(bearer),
 ) -> JSONResponse:
-    records = await record_service.get_records(credentials.credentials)
+    records = await record_service.get_records(credentials.user["id"])
     return JSONResponse(
         content=records,
         status_code=status.HTTP_200_OK,
@@ -42,13 +42,13 @@ async def get_records(
     "/{key}",
 )
 async def create_or_update_record(
-    credentials: HTTPAuthorizationCredentials = Security(bearer),
+    credentials: HTTPAuthorizationCredentialsWithUser = Security(bearer),
     key: str = KeyPath,
     payload: dict = Body(...),
     ttl: int | None = None,
 ) -> Response:
     await record_service.create_or_update_record(
-        credentials.credentials, key, payload, ttl
+        credentials.user["id"], key, payload, ttl
     )
     return Response(status_code=status.HTTP_201_CREATED)
 
@@ -57,9 +57,10 @@ async def create_or_update_record(
     "/{key}",
 )
 async def delete_record(
-    credentials: HTTPAuthorizationCredentials = Security(bearer), key: str = KeyPath
+    credentials: HTTPAuthorizationCredentialsWithUser = Security(bearer),
+    key: str = KeyPath,
 ) -> Response:
-    deleted = await record_service.delete_record(credentials.credentials, key)
+    deleted = await record_service.delete_record(credentials.user["id"], key)
     return Response(
         status_code=status.HTTP_204_NO_CONTENT if deleted else status.HTTP_404_NOT_FOUND
     )
@@ -69,9 +70,10 @@ async def delete_record(
     "/{key}",
 )
 async def get_record(
-    credentials: HTTPAuthorizationCredentials = Security(bearer), key: str = KeyPath
+    credentials: HTTPAuthorizationCredentialsWithUser = Security(bearer),
+    key: str = KeyPath,
 ) -> JSONResponse:
-    value = await record_service.get_record_value(credentials.credentials, key)
+    value = await record_service.get_record_value(credentials.user["id"], key)
     return JSONResponse(
         content=value,
         status_code=status.HTTP_200_OK
