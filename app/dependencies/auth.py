@@ -26,5 +26,6 @@ class HTTPBearerAPIKey(HTTPBearer):
             scheme=credentials.scheme, credentials=credentials.credentials, user=user
         )
 
+        request.state.api_key = api_key
         request.state.user = user
         return result
