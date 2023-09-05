@@ -8,6 +8,8 @@ from app.middlewares.rate_limit import RateLimitMiddleware
 from app.middlewares.size import LimitUploadSizeMiddleware
 from app.routers.record import record_router, records_router
 from app.settings import Environment, settings
+from fastapi import Security
+from app.dependencies.auth import HTTPBearerAPIKey
 
 if settings.environment == Environment.Production:
     sentry_sdk.init(
@@ -15,7 +17,9 @@ if settings.environment == Environment.Production:
         traces_sample_rate=0.1,
     )
 
-api = FastAPI()
+bearer = HTTPBearerAPIKey()
+
+api = FastAPI(dependencies=[Security(bearer)])
 
 api.add_middleware(
     RateLimitMiddleware, rate_limit=60, time_interval=1
