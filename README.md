@@ -3,10 +3,10 @@
 This is a simple example of a key-value store built using FastAPI and DynamoDB. All data is stored in a single DynamoDB table using single-table design.
 
 ## API Features
-1. Store and retrieve JSON data
-2. Only authentication by api key is supported
-3. Rate limiting by api key to 10 requests per second
-4. API upload size limit to 400KB
+1. Authentication and rate limiting by api key
+2. Limit maximum payload size to 400KB
+3. Store and retrieve JSON data
+4. 
 
 ## DynamoDB Table Structure
 |PK|SK|VALUE|
@@ -56,12 +56,17 @@ These instructions will get you a copy of the project up and running on your loc
     poetry install
     ```
 
-4. Create local DynamoDB table
+4. Run local DynamoDB server
+    ```bash
+    docker-compose up
+    ```
+
+5. Create local DynamoDB table
     ```bash
     ./scripts/create-table.sh
     ```
     
-5. Create api key needed to access the API
+6. Create api key needed to access the API
     ```bash
     ./scripts/create-user.sh
     ```

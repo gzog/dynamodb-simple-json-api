@@ -7,7 +7,7 @@ from fastapi import status, Response
 class TestCreateOrUpdateRecord:
     def test_create_record_without_ttl(self, client: TestClient):
         response: Response = client.post(
-            "/record/key",
+            "/records/key",
             json={"hello": "world"},
         )
 
@@ -17,7 +17,7 @@ class TestCreateOrUpdateRecord:
         ttl = int((datetime.utcnow() + relativedelta(seconds=60)).timestamp())
 
         response: Response = client.post(
-            f"/record/key-valid-ttl?ttl={ttl}",
+            f"/records/key-valid-ttl?ttl={ttl}",
             json={"hello": "world"},
         )
 
@@ -27,7 +27,7 @@ class TestCreateOrUpdateRecord:
         ttl = int((datetime.utcnow() - relativedelta(seconds=60)).timestamp())
 
         response: Response = client.post(
-            f"/record/key-expired-ttl?ttl={ttl}",
+            f"/records/key-expired-ttl?ttl={ttl}",
             json={"hello": "world"},
         )
 
@@ -35,7 +35,7 @@ class TestCreateOrUpdateRecord:
 
     def test_create_record_with_invalid_key(self, client: TestClient):
         response: Response = client.post(
-            "/record/key-record-@.!@#$%'",
+            "/records/key-record-@.!@#$%'",
             json={"hello": "world"},
         )
 
@@ -55,7 +55,7 @@ class TestCreateOrUpdateRecord:
 
     def test_create_record_with_invalid_payload(self, client: TestClient):
         response: Response = client.post(
-            "/record/key-invalid-payload",
+            "/records/key-invalid-payload",
             content="bla",
         )
 
@@ -75,24 +75,24 @@ class TestCreateOrUpdateRecord:
 
 class TestGetRecord:
     def test_get_record_without_ttl(self, client: TestClient):
-        response: Response = client.get("/record/key")
+        response: Response = client.get("/records/key")
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == {"hello": "world"}
 
     def test_get_record_with_non_expired_ttl(self, client: TestClient):
-        response: Response = client.get("/record/key-valid-ttl")
+        response: Response = client.get("/records/key-valid-ttl")
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == {"hello": "world"}
 
     def test_get_record_with_expired_ttl(self, client: TestClient):
-        response: Response = client.get("/record/key-expired-ttl")
+        response: Response = client.get("/records/key-expired-ttl")
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_get_record_does_not_exist(self, client):
-        response: Response = client.get("/record/key-not-found")
+        response: Response = client.get("/records/key-not-found")
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
@@ -115,17 +115,17 @@ class TestGetRecords:
 
 class TestDeleteRecord:
     def test_delete_existing_record(self, client: TestClient):
-        response: Response = client.delete("/record/key")
+        response: Response = client.delete("/records/key")
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
     def test_delete_existing_record_with_valid_ttl(self, client: TestClient):
-        response: Response = client.delete("/record/key-valid-ttl")
+        response: Response = client.delete("/records/key-valid-ttl")
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
     def test_delete_existing_record_with_expired_ttl(self, client: TestClient):
-        response: Response = client.delete("/record/key-expired-ttl")
+        response: Response = client.delete("/records/key-expired-ttl")
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_delete_HTTP_404_NOT_FOUND_record(self, client: TestClient):
-        response: Response = client.delete("/record/key-not-found")
+        response: Response = client.delete("/records/key-not-found")
         assert response.status_code == status.HTTP_404_NOT_FOUND

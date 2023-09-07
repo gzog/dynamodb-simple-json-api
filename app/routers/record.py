@@ -3,7 +3,6 @@ from fastapi.responses import JSONResponse
 from app.routers.schemas import KeyPath
 from app.services import record as record_service
 
-record_router = APIRouter(prefix="/record")
 records_router = APIRouter(prefix="/records")
 
 
@@ -33,7 +32,7 @@ async def get_records(
     )
 
 
-@record_router.post(
+@records_router.post(
     "/{key}",
 )
 async def create_or_update_record(
@@ -48,7 +47,7 @@ async def create_or_update_record(
     return Response(status_code=status.HTTP_201_CREATED)
 
 
-@record_router.delete(
+@records_router.delete(
     "/{key}",
 )
 async def delete_record(
@@ -61,7 +60,7 @@ async def delete_record(
     )
 
 
-@record_router.get(
+@records_router.get(
     "/{key}",
 )
 async def get_record(
