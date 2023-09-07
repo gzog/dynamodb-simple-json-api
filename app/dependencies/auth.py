@@ -1,4 +1,5 @@
 from app.services.api_key import get_user
+from app.utils.cache import cache
 from fastapi import Request, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
@@ -17,10 +18,14 @@ class HTTPBearerAPIKey(HTTPBearer):
             return None
 
         api_key = credentials.credentials
-        user = await get_user(api_key)
+
+        if not cache.get(api_key):
+            user = await get_user(api_key)
 
         if not user:
             raise HTTPException(status_code=401, detail="Invalid API Key")
+
+        cache.set(api_key, user, 1)
 
         result = HTTPAuthorizationCredentialsWithUser(
             scheme=credentials.scheme, credentials=credentials.credentials, user=user
