@@ -1,7 +1,6 @@
 import pytest
 import asyncio
 from fastapi.testclient import TestClient
-from app.settings import settings
 from pytest import fixture
 
 from app.main import api
@@ -18,12 +17,17 @@ def event_loop() -> asyncio.unix_events._UnixSelectorEventLoop:
 
 
 @fixture(scope="session", autouse=True)
-def user(event_loop: asyncio.unix_events._UnixSelectorEventLoop) -> dict:
+def api_key():
+    return "secret"
+
+
+@fixture(scope="session", autouse=True)
+def user(api_key: str, event_loop: asyncio.unix_events._UnixSelectorEventLoop) -> dict:
     event_loop.run_until_complete(
-        create_or_update_user(settings.api_key, {"id": 5, "name": "George"})
+        create_or_update_user(api_key, {"id": 5, "name": "George"})
     )
 
 
 @fixture(scope="session", autouse=True)
-def client() -> TestClient:
-    return TestClient(app=api, headers={"Authorization": f"Bearer {settings.api_key}"})
+def client(api_key: str) -> TestClient:
+    return TestClient(app=api, headers={"Authorization": f"Bearer {api_key}"})

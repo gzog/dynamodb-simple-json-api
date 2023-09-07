@@ -19,7 +19,8 @@ class HTTPBearerAPIKey(HTTPBearer):
 
         api_key = credentials.credentials
 
-        if not cache.get(api_key):
+        user = cache.get(api_key)
+        if not user:
             user = await get_user(api_key)
 
         if not user:

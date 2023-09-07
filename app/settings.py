@@ -15,8 +15,6 @@ class Settings(BaseSettings):
     aws_region_name: str = Field(..., env="region_name")
     aws_dynamodb_table_name: str = Field(..., env="aws_dynamodb_table_name")
 
-    api_key: str = Field(..., env="api_key")
-
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
 
