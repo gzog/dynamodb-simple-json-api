@@ -19,7 +19,11 @@ if settings.environment == Environment.Production:
 
 bearer = HTTPBearerAPIKey()
 
-api = FastAPI(dependencies=[Security(bearer), Depends(RateLimitAPIKey())])
+
+api = FastAPI(
+    title="DynamoDB Simple JSON API",
+    dependencies=[Security(bearer), Depends(RateLimitAPIKey())],
+)
 
 api.add_middleware(LimitUploadSizeMiddleware, max_upload_size=400_000)  # 400KB
 api.add_middleware(LogMiddleware)

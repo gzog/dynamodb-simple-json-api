@@ -1,9 +1,9 @@
-from app.utils.aws import dynamodb
+from app.utils.aws import get_dynamodb_client
 from datetime import datetime
 from app.settings import settings
 
 
-def create_or_update(
+async def create_or_update(
     partition_key: str, sort_key: str, value: str, ttl: int | None
 ) -> None:
     item = {"PK": {"S": partition_key}, "SK": {"S": sort_key}, "VALUE": {"S": value}}
@@ -11,17 +11,19 @@ def create_or_update(
     if ttl:
         item["TTL"] = {"N": str(ttl)}
 
-    dynamodb.put_item(
-        TableName=settings.aws_dynamodb_table_name,
-        Item=item,
-    )
+    async with get_dynamodb_client() as dynamodb:
+        await dynamodb.put_item(
+            TableName=settings.aws_dynamodb_table_name,
+            Item=item,
+        )
 
 
-def get(partition_key: str, sort_key: str) -> str | None:
-    response = dynamodb.get_item(
-        TableName=settings.aws_dynamodb_table_name,
-        Key={"PK": {"S": partition_key}, "SK": {"S": sort_key}},
-    )
+async def get(partition_key: str, sort_key: str) -> str | None:
+    async with get_dynamodb_client() as dynamodb:
+        response = await dynamodb.get_item(
+            TableName=settings.aws_dynamodb_table_name,
+            Key={"PK": {"S": partition_key}, "SK": {"S": sort_key}},
+        )
 
     if "Item" not in response:
         return None
@@ -35,12 +37,13 @@ def get(partition_key: str, sort_key: str) -> str | None:
     return item
 
 
-def delete(partition_key: str, sort_key: str) -> bool:
-    response = dynamodb.delete_item(
-        TableName=settings.aws_dynamodb_table_name,
-        Key={"PK": {"S": partition_key}, "SK": {"S": sort_key}},
-        ReturnValues="ALL_OLD",
-    )
+async def delete(partition_key: str, sort_key: str) -> bool:
+    async with get_dynamodb_client() as dynamodb:
+        response = await dynamodb.delete_item(
+            TableName=settings.aws_dynamodb_table_name,
+            Key={"PK": {"S": partition_key}, "SK": {"S": sort_key}},
+            ReturnValues="ALL_OLD",
+        )
 
     # The "delete_item" operation is idempotent.
     # This is a trick to check if an item is deleted or not
@@ -53,34 +56,36 @@ def delete(partition_key: str, sort_key: str) -> bool:
     return not _is_expired(ttl) if ttl else True
 
 
-def get_sort_keys(partition_key: str) -> list[str]:
-    response = dynamodb.query(
-        TableName=settings.aws_dynamodb_table_name,
-        KeyConditionExpression="PK = :PK",
-        ProjectionExpression="SK",
-        FilterExpression="attribute_not_exists(#TTL) or #TTL >= :ttl",
-        ExpressionAttributeNames={"#TTL": "TTL"},
-        ExpressionAttributeValues={
-            ":PK": {"S": partition_key},
-            ":ttl": {"N": str(get_current_timestamp())},
-        },
-    )
+async def get_sort_keys(partition_key: str) -> list[str]:
+    async with get_dynamodb_client() as dynamodb:
+        response = await dynamodb.query(
+            TableName=settings.aws_dynamodb_table_name,
+            KeyConditionExpression="PK = :PK",
+            ProjectionExpression="SK",
+            FilterExpression="attribute_not_exists(#TTL) or #TTL >= :ttl",
+            ExpressionAttributeNames={"#TTL": "TTL"},
+            ExpressionAttributeValues={
+                ":PK": {"S": partition_key},
+                ":ttl": {"N": str(get_current_timestamp())},
+            },
+        )
 
     return [elem["SK"]["S"] for elem in response["Items"]]
 
 
-def get_sort_values(partition_key: str) -> list[str]:
-    response = dynamodb.query(
-        TableName=settings.aws_dynamodb_table_name,
-        KeyConditionExpression="PK = :PK",
-        ProjectionExpression="#VALUE",
-        FilterExpression="attribute_not_exists(#TTL) or #TTL >= :ttl",
-        ExpressionAttributeNames={"#TTL": "TTL", "#VALUE": "VALUE"},
-        ExpressionAttributeValues={
-            ":PK": {"S": partition_key},
-            ":ttl": {"N": str(get_current_timestamp())},
-        },
-    )
+async def get_sort_values(partition_key: str) -> list[str]:
+    async with get_dynamodb_client() as dynamodb:
+        response = await dynamodb.query(
+            TableName=settings.aws_dynamodb_table_name,
+            KeyConditionExpression="PK = :PK",
+            ProjectionExpression="#VALUE",
+            FilterExpression="attribute_not_exists(#TTL) or #TTL >= :ttl",
+            ExpressionAttributeNames={"#TTL": "TTL", "#VALUE": "VALUE"},
+            ExpressionAttributeValues={
+                ":PK": {"S": partition_key},
+                ":ttl": {"N": str(get_current_timestamp())},
+            },
+        )
 
     return [elem["VALUE"]["S"] for elem in response["Items"]]
 

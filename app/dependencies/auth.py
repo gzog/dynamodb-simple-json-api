@@ -17,7 +17,7 @@ class HTTPBearerAPIKey(HTTPBearer):
             return None
 
         api_key = credentials.credentials
-        user = get_user(api_key)
+        user = await get_user(api_key)
 
         if not user:
             raise HTTPException(status_code=401, detail="Invalid API Key")

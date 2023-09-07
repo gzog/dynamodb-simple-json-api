@@ -1,5 +1,6 @@
 import time
 from fastapi import Request, HTTPException
+from app.settings import settings, Environment
 
 # Allowed requests per second
 REQUESTS = 10
@@ -37,6 +38,9 @@ cache = Cache()
 class RateLimitAPIKey:
     def __call__(self, request: Request) -> None:
         api_key = request.state.api_key
+
+        if settings.environment == Environment.Local:
+            return
 
         number_of_requests = cache.get(api_key) or 0
 

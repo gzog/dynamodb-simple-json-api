@@ -1,8 +1,7 @@
+from fastapi.testclient import TestClient
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-from fastapi import status
-from httpx import Response
-from fastapi.testclient import TestClient
+from fastapi import status, Response
 
 
 class TestCreateOrUpdateRecord:
