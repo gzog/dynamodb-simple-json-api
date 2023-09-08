@@ -1,10 +1,16 @@
+import uuid
 import pytest
 import asyncio
 from fastapi.testclient import TestClient
 from pytest import fixture
 
 from app.main import api
+from app.settings import settings, Environment
 from app.services.api_key import create_or_update_user
+from app.services.table import create_dynamodb_table
+
+settings.aws_dynamodb_table_name = f"aiobotocore-{uuid.uuid4()}"
+settings.environment = Environment.Test
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -26,6 +32,11 @@ def user(api_key: str, event_loop: asyncio.unix_events._UnixSelectorEventLoop) -
     event_loop.run_until_complete(
         create_or_update_user(api_key, {"id": 5, "name": "George"})
     )
+
+
+@fixture(scope="session", autouse=True)
+def create_table(event_loop: asyncio.unix_events._UnixSelectorEventLoop):
+    event_loop.run_until_complete(create_dynamodb_table())
 
 
 @fixture(scope="session", autouse=True)

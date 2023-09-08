@@ -10,7 +10,7 @@ class RateLimitAPIKey:
     def __call__(self, request: Request) -> None:
         api_key = request.state.api_key
 
-        if settings.environment == Environment.Local:
+        if settings.environment != Environment.Production:
             return
 
         number_of_requests = cache.get(api_key) or 0

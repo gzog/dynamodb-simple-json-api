@@ -29,3 +29,4 @@ settings = get_settings()
 class Environment(str, Enum):
     Production = "production"
     Local = "local"
+    Test = "test"
