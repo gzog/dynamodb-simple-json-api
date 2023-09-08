@@ -9,7 +9,7 @@ from app.settings import settings, Environment
 from app.services.api_key import create_or_update_user
 from app.services.table import create_dynamodb_table
 
-settings.aws_dynamodb_table_name = f"aiobotocore-{uuid.uuid4()}"
+settings.aws_dynamodb_table_name = f"dynamodb-{uuid.uuid4()}"
 settings.environment = Environment.Test
 
 

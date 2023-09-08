@@ -8,12 +8,16 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     sentry_dsn: str = "https://b5c2f49ccf20cdd5daec6f03d656cbdc@o4504411712258048.ingest.sentry.io/4505773483950080"
 
-    environment: str = Field(..., env="environment")
+    environment: str = Field(json_schema_extra={"env": "environment"})
 
-    aws_access_key_id: str = Field(..., env="aws_access_key_id")
-    aws_secret_access_key: str = Field(..., env="aws_secret_access_key")
-    aws_region_name: str = Field(..., env="region_name")
-    aws_dynamodb_table_name: str = Field(..., env="aws_dynamodb_table_name")
+    aws_access_key_id: str = Field(json_schema_extra={"env": "aws_access_key_id"})
+    aws_secret_access_key: str = Field(json_schema_extra={"env": "aws_secret_access_key"})
+    aws_region_name: str = Field(json_schema_extra={"env": "region_name"})
+    aws_dynamodb_table_name: str = Field(
+        json_schema_extra={"env": "aws_dynamodb_table_name"}
+    )
+
+    requests_per_second: int = Field(json_schema_extra={"env": "requests_per_second"})
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
