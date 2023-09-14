@@ -82,7 +82,7 @@ Open your browser and navigate to [http://localhost:8000/docs](http://localhost:
 
 ## Endpoints
 - **GET `/records/keys`**: Retrieve all keys of records
-- **GET `/records/`**: Retrieve all records
+- **GET `/records`**: Retrieve all records
 - **GET `/records/{key}`**: Retrieve a value by its key.
 - **POST `/records/{key}`**: Insert a new key-value pair. The request body should contain a JSON object.
 - **PUT `/records/{key}`**: Update the value for an existing key. The request body should contain the new `value`.
