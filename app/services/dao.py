@@ -90,9 +90,9 @@ async def get_sort_values(partition_key: str) -> list[str]:
     return [elem["VALUE"]["S"] for elem in response["Items"]]
 
 
-def _is_expired(ttl: int):
+def _is_expired(ttl: int) -> bool:
     return ttl < get_current_timestamp()
 
 
-def get_current_timestamp():
+def get_current_timestamp() -> int:
     return int((datetime.utcnow()).timestamp())

@@ -15,7 +15,7 @@ def get_primary_key(api_key: str) -> tuple[str, str]:
     return get_partition_key(api_key), get_sort_key(api_key)
 
 
-async def get_user(api_key: str):
+async def get_user(api_key: str) -> dict | None:
     value_str = await dao.get(*get_primary_key(api_key))
     return json.loads(value_str) if value_str else None
 

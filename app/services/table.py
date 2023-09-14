@@ -3,7 +3,7 @@ from app.settings import settings
 from app.utils.logger import logger
 
 
-async def create_dynamodb_table():
+async def create_dynamodb_table() -> None:
     table_name = settings.aws_dynamodb_table_name
     async with get_dynamodb_client() as dynamodb:
         logger.debug("Requesting table creation...")

@@ -49,6 +49,8 @@ exclude = '''
 '''
 
 [tool.mypy]
+disallow_untyped_defs = true
+show_error_codes = true
 ignore_missing_imports = true
 exclude = [
     ".venv",

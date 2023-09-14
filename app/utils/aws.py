@@ -1,4 +1,4 @@
-from aiobotocore.session import get_session
+from aiobotocore.session import get_session, ClientCreatorContext
 
 from app.settings import Environment, settings
 
@@ -6,7 +6,7 @@ from app.settings import Environment, settings
 session = get_session()
 
 
-def get_dynamodb_client():
+def get_dynamodb_client() -> ClientCreatorContext:
     if settings.environment == Environment.Production:
         return session.create_client(
             "dynamodb",

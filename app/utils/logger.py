@@ -1,13 +1,13 @@
 import json
 import logging
-from logging import Formatter
+from logging import Formatter, LogRecord
 
 
 class JsonFormatter(Formatter):
-    def __init__(self):
+    def __init__(self) -> None:
         super(JsonFormatter, self).__init__()
 
-    def format(self, record):
+    def format(self, record: LogRecord) -> str:
         json_record = {}
         json_record["message"] = record.getMessage()
         if "req" in record.__dict__:

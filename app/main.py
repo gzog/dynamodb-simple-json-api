@@ -32,7 +32,9 @@ api.include_router(records_router)
 
 
 @api.exception_handler(RateLimitExceeded)
-async def rate_limit_exception_handler(request: Request, exc: RateLimitExceeded):
+async def rate_limit_exception_handler(
+    request: Request, exc: RateLimitExceeded
+) -> Response:
     return Response(
         status_code=status.HTTP_429_TOO_MANY_REQUESTS,
     )
