@@ -80,30 +80,11 @@ Run the Uvicorn server from the command line:
 
 Open your browser and navigate to [http://localhost:8000/docs](http://localhost:8000/docs) to view the interactive FastAPI documentation.
 
-## Example Endpoints
-
+## Endpoints
+- **GET `/records/keys`**: Retrieve all keys of records
+- **GET `/records/`**: Retrieve all records
 - **GET `/records/{key}`**: Retrieve a value by its key.
 - **POST `/records/{key}`**: Insert a new key-value pair. The request body should contain a JSON object.
 - **PUT `/records/{key}`**: Update the value for an existing key. The request body should contain the new `value`.
 - **DELETE `/records/{key}`**: Remove a key-value pair by its key.
 
-### Example Usage
-
-1. Insert a new key-value pair
-    ```bash
-    curl -X 'POST' \
-      'http://localhost:8000/records/' \
-      -H 'accept: application/json' \
-      -H 'Content-Type: application/json' \
-      -d '{
-      "key": "sample_key",
-      "value": "sample_value"
-    }'
-    ```
-
-2. Retrieve a value by its key
-    ```bash
-    curl -X 'GET' \
-      'http://localhost:8000/items/sample_key' \
-      -H 'accept: application/json'
-    ```
