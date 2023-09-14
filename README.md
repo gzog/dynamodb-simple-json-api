@@ -3,10 +3,9 @@
 This is a simple example of a key-value store built using FastAPI and DynamoDB. All data is stored in a single DynamoDB table using single-table design.
 
 ## API Features
-1. Authentication and rate limiting by api key
-2. Limit maximum payload size to 400KB
-3. Store and retrieve JSON data
-4. 
+1. CRUD operations on JSON data based on api key that in DynamoDB table.
+2. Authentication and rate limiting by api key
+3. Limit maximum payload size to 400KB
 
 ## DynamoDB Table Structure
 |PK|SK|VALUE|
@@ -21,7 +20,7 @@ This is a simple example of a key-value store built using FastAPI and DynamoDB. 
 ### Record model structure
 |PK|SK|VALUE|
 |---|---|---|
-||String|String|
+|String|String|String|
 
 ### API Key model structure
 |PK|SK|VALUE|
