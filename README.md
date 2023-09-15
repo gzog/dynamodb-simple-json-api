@@ -26,7 +26,7 @@ This is a simple example of a key-value store built using FastAPI and DynamoDB. 
 ### Record model structure
 |PK|SK|VALUE|
 |---|---|---|
-|USER#{user_id}|KEY#{key_id}|{...}|
+|USER#{user_id}|RECORD_KEY#{key_id}|{...}|
 
 ## Getting Started
 
