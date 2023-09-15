@@ -17,10 +17,11 @@ This is a simple example of a key-value store built using FastAPI and DynamoDB. 
 3. Sort Key is SK
 4. Value is always a JSON string
 
+
 ### API Key model structure
 |PK|SK|VALUE|
 |---|---|---|
-|API_KEY#{api_key}|API_KEY#{api_key}|{"id": {user_id}, "name": {user_name}}|
+|API_KEY#{api_key}|API_KEY#{api_key}|{"id": {user_id}, "name": {name} }|
 
 
 ### Record model structure
