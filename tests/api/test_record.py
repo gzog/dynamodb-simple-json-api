@@ -102,7 +102,7 @@ class TestGetRecordKeys:
         response: Response = client.get("/records/keys")
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.json() == ["KEY#key", "KEY#key-valid-ttl"]
+        assert response.json() == ["RECORD_KEY#key", "RECORD_KEY#key-valid-ttl"]
 
 
 class TestGetRecords:

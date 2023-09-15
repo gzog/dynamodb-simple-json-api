@@ -40,4 +40,4 @@ def get_partition_key(user_id: str) -> str:
 
 
 def get_sort_key(key: str) -> str:
-    return f"KEY#{key}"
+    return f"RECORD_KEY#{key}"
