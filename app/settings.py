@@ -19,9 +19,13 @@ class Settings(BaseSettings):
 
     requests_per_second: int = Field(json_schema_extra={"env": "requests_per_second"})
 
+    log_level: str = Field(json_schema_extra={"env": "log_level"}, default="INFO")
+
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
     max_upload_size: int = 409_600  # 400KB
+
+    disable_existing_loggers: bool = True
 
 
 @lru_cache()

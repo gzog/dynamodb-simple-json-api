@@ -1,5 +1,6 @@
 import json
 import logging
+from app.settings import settings
 from logging import Formatter, LogRecord
 
 
@@ -19,10 +20,12 @@ class JsonFormatter(Formatter):
         return json.dumps(json_record)
 
 
+for name, logger in logging.root.manager.loggerDict.items():
+    logger.disabled = settings.disable_existing_loggers  # type: ignore
+
+
 logger = logging.root
 handler = logging.StreamHandler()
 handler.setFormatter(JsonFormatter())
 logger.handlers = [handler]
-logger.setLevel(logging.INFO)
-
-logging.getLogger("uvicorn.access").disabled = True
+logger.setLevel(settings.log_level)
