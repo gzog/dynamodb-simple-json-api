@@ -29,9 +29,9 @@ def api_key():
 
 @fixture(scope="session", autouse=True)
 def user(api_key: str, event_loop: asyncio.unix_events._UnixSelectorEventLoop) -> dict:
-    event_loop.run_until_complete(
-        create_or_update_user(api_key, {"id": 5, "name": "George"})
-    )
+    result = {"id": "5", "name": "George"}
+    event_loop.run_until_complete(create_or_update_user(api_key, result))
+    return result
 
 
 @fixture(scope="session", autouse=True)

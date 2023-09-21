@@ -56,38 +56,70 @@ async def delete(partition_key: str, sort_key: str) -> bool:
     return not _is_expired(ttl) if ttl else True
 
 
-async def get_sort_keys(partition_key: str) -> list[str]:
+async def get_sort_keys(
+    partition_key: str, from_sort_key: str | None = None
+) -> tuple[list[str], str | None]:
     async with get_dynamodb_client() as dynamodb:
-        response = await dynamodb.query(
-            TableName=settings.aws_dynamodb_table_name,
-            KeyConditionExpression="PK = :PK",
-            ProjectionExpression="SK",
-            FilterExpression="attribute_not_exists(#TTL) or #TTL >= :ttl",
-            ExpressionAttributeNames={"#TTL": "TTL"},
-            ExpressionAttributeValues={
+        query_params = {
+            "TableName": settings.aws_dynamodb_table_name,
+            "KeyConditionExpression": "PK = :PK",
+            "ProjectionExpression": "SK",
+            "FilterExpression": "attribute_not_exists(#TTL) or #TTL >= :ttl",
+            "ExpressionAttributeNames": {"#TTL": "TTL"},
+            "ExpressionAttributeValues": {
                 ":PK": {"S": partition_key},
                 ":ttl": {"N": str(get_current_timestamp())},
             },
-        )
+        }
 
-    return [elem["SK"]["S"] for elem in response["Items"]]
+        if from_sort_key is not None:
+            query_params["ExclusiveStartKey"] = {
+                "PK": {"S": partition_key},
+                "SK": {"S": from_sort_key},
+            }
+
+        response = await dynamodb.query(**query_params)
+
+    last_evaluated_key = (
+        response["LastEvaluatedKey"]["SK"]["S"]
+        if "LastEvaluatedKey" in response
+        else None
+    )
+
+    return [elem["SK"]["S"] for elem in response["Items"]], last_evaluated_key
 
 
-async def get_sort_values(partition_key: str) -> list[str]:
+async def get_sort_values(
+    partition_key: str, from_sort_key: str | None = None
+) -> tuple[list[str], str | None]:
     async with get_dynamodb_client() as dynamodb:
-        response = await dynamodb.query(
-            TableName=settings.aws_dynamodb_table_name,
-            KeyConditionExpression="PK = :PK",
-            ProjectionExpression="#VALUE",
-            FilterExpression="attribute_not_exists(#TTL) or #TTL >= :ttl",
-            ExpressionAttributeNames={"#TTL": "TTL", "#VALUE": "VALUE"},
-            ExpressionAttributeValues={
+        query_params = {
+            "TableName": settings.aws_dynamodb_table_name,
+            "KeyConditionExpression": "PK = :PK",
+            "ProjectionExpression": "#VALUE",
+            "FilterExpression": "attribute_not_exists(#TTL) or #TTL >= :ttl",
+            "ExpressionAttributeNames": {"#TTL": "TTL", "#VALUE": "VALUE"},
+            "ExpressionAttributeValues": {
                 ":PK": {"S": partition_key},
                 ":ttl": {"N": str(get_current_timestamp())},
             },
-        )
+        }
 
-    return [elem["VALUE"]["S"] for elem in response["Items"]]
+        if from_sort_key is not None:
+            query_params["ExclusiveStartKey"] = {
+                "PK": {"S": partition_key},
+                "SK": {"S": from_sort_key},
+            }
+
+        response = await dynamodb.query(**query_params)
+
+    last_evaluated_key = (
+        response["LastEvaluatedKey"]["SK"]["S"]
+        if "LastEvaluatedKey" in response
+        else None
+    )
+
+    return [elem["VALUE"]["S"] for elem in response["Items"]], last_evaluated_key
 
 
 def _is_expired(ttl: int) -> bool:

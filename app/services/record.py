@@ -22,13 +22,19 @@ async def delete_record(user_id: str, key: str) -> bool:
     return await dao.delete(*get_primary_key(user_id, key))
 
 
-async def get_record_keys(user_id: str) -> list[str]:
-    return await dao.get_sort_keys(get_partition_key(user_id))
+async def get_record_keys(
+    user_id: str, from_record_key: str | None
+) -> tuple[list[str], str | None]:
+    return await dao.get_sort_keys(get_partition_key(user_id), from_record_key)
 
 
-async def get_records(user_id: str) -> list[dict]:
-    value_strs = await dao.get_sort_values(get_partition_key(user_id))
-    return [json.loads(value_str) for value_str in value_strs]
+async def get_records(
+    user_id: str, from_record_key: str | None
+) -> tuple[list[dict], str | None]:
+    value_strs, last_evaluated_key = await dao.get_sort_values(
+        get_partition_key(user_id), from_record_key
+    )
+    return [json.loads(value_str) for value_str in value_strs], last_evaluated_key
 
 
 def get_primary_key(user_id: str, key: str) -> tuple[str, str]:

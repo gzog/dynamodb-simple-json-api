@@ -1,7 +1,9 @@
+import pytest
 from fastapi.testclient import TestClient
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from fastapi import status, Response
+from app.services import record as record_service
 
 
 class TestCreateOrUpdateRecord:
@@ -129,3 +131,60 @@ class TestDeleteRecord:
     def test_delete_HTTP_404_NOT_FOUND_record(self, client: TestClient):
         response: Response = client.delete("/records/key-not-found")
         assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+class TestGetRecordKeysWithLastEvaluatedKey:
+    @pytest.mark.asyncio
+    async def test_get_record_keys(self, client: TestClient, user: dict[str, str]):
+        for i in range(12):
+            await record_service.create_or_update_record(
+                user["id"], f"key{i}", {"hello" * 10000: "world" * 10000}, None
+            )
+
+        response: Response = client.get("/records/keys")
+
+        assert response.status_code == status.HTTP_200_OK
+
+        assert "x-lastevaluated-key" in response.headers
+        assert len(response.json()) == 11
+
+
+class TestGetRecordKeysWithPaginatedResult:
+    @pytest.mark.asyncio
+    async def test_get_record_keys_subset(self, client: TestClient, user: dict[str, str]):
+        for i in range(12):
+            await record_service.create_or_update_record(
+                user["id"], f"key{i}", {"hello" * 10000: "world" * 10000}, None
+            )
+
+        response: Response = client.get("/records/keys")
+
+        assert response.status_code == status.HTTP_200_OK
+
+        last_evaluated_key = response.headers["x-lastevaluated-key"]
+        assert len(response.json()) == 11
+
+        response: Response = client.get(
+            "/records/keys", headers={"from-record-key": last_evaluated_key}
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.json()) == 1
+
+
+class TestGetRecordsWithPaginatedResult:
+    @pytest.mark.asyncio
+    async def test_get_records_subset(self, client: TestClient, user: dict[str, str]):
+        response: Response = client.get("/records/")
+
+        assert response.status_code == status.HTTP_200_OK
+
+        last_evaluated_key = response.headers["x-lastevaluated-key"]
+        assert len(response.json()) == 11
+
+        response: Response = client.get(
+            "/records/", headers={"from-record-key": last_evaluated_key}
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.json()) == 1

@@ -6,7 +6,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    sentry_dsn: str = "https://b5c2f49ccf20cdd5daec6f03d656cbdc@o4504411712258048.ingest.sentry.io/4505773483950080"
+    sentry_dsn: str = Field(json_schema_extra={"env": "sentry_dsn"})
 
     environment: str = Field(json_schema_extra={"env": "environment"})
 

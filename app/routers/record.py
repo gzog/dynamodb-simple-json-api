@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Body, Response, Request, status
+from fastapi import APIRouter, Body, Response, Request, status, Header
 from fastapi.responses import JSONResponse
 from app.routers.schemas import KeyPath
 from app.services import record as record_service
@@ -11,12 +11,21 @@ records_router = APIRouter(prefix="/records")
 )
 async def get_record_keys(
     request: Request,
+    from_record_key: str | None = Header(default=None),
 ) -> JSONResponse:
-    keys = await record_service.get_record_keys(request.state.user["id"])
-    return JSONResponse(
+    keys, last_evaluated_key = await record_service.get_record_keys(
+        request.state.user["id"], from_record_key
+    )
+
+    response = JSONResponse(
         content=keys,
         status_code=status.HTTP_200_OK,
     )
+
+    if last_evaluated_key:
+        response.headers["X-LastEvaluated-Key"] = last_evaluated_key
+
+    return response
 
 
 @records_router.get(
@@ -24,12 +33,21 @@ async def get_record_keys(
 )
 async def get_records(
     request: Request,
+    from_record_key: str | None = Header(default=None),
 ) -> JSONResponse:
-    records = await record_service.get_records(request.state.user["id"])
-    return JSONResponse(
+    records, last_evaluated_key = await record_service.get_records(
+        request.state.user["id"], from_record_key
+    )
+
+    response = JSONResponse(
         content=records,
         status_code=status.HTTP_200_OK,
     )
+
+    if last_evaluated_key:
+        response.headers["X-LastEvaluated-Key"] = last_evaluated_key
+
+    return response
 
 
 @records_router.post(
