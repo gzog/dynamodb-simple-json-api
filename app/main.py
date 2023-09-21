@@ -2,7 +2,7 @@ import sentry_sdk
 from fastapi import FastAPI, Request, Response
 from starlette import status
 
-from app.exceptions import RateLimitExceeded
+from app.exceptions import RateLimitExceeded, MaxAllowedSizeExceeded
 from app.middlewares.log import LogMiddleware
 from app.middlewares.size import LimitUploadSizeMiddleware
 from app.routers.record import records_router
@@ -25,7 +25,7 @@ api = FastAPI(
     dependencies=[Security(bearer), Depends(RateLimitAPIKey())],
 )
 
-api.add_middleware(LimitUploadSizeMiddleware, max_upload_size=400_000)  # 400KB
+api.add_middleware(LimitUploadSizeMiddleware)  # 400KB
 api.add_middleware(LogMiddleware)
 
 api.include_router(records_router)
@@ -37,4 +37,13 @@ async def rate_limit_exception_handler(
 ) -> Response:
     return Response(
         status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+    )
+
+
+@api.exception_handler(MaxAllowedSizeExceeded)
+async def max_allowed_size_exceeded_exception_handler(
+    request: Request, exc: RateLimitExceeded
+) -> Response:
+    return Response(
+        status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
     )

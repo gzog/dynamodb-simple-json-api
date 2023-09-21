@@ -1,6 +1,8 @@
 from app.utils.aws import get_dynamodb_client
+from botocore import exceptions
 from datetime import datetime
 from app.settings import settings
+from app.exceptions import MaxAllowedSizeExceeded
 
 
 async def create_or_update(
@@ -12,10 +14,14 @@ async def create_or_update(
         item["TTL"] = {"N": str(ttl)}
 
     async with get_dynamodb_client() as dynamodb:
-        await dynamodb.put_item(
-            TableName=settings.aws_dynamodb_table_name,
-            Item=item,
-        )
+        try:
+            await dynamodb.put_item(
+                TableName=settings.aws_dynamodb_table_name,
+                Item=item,
+            )
+        except exceptions.ClientError as e:
+            if "exceeded the maximum allowed size" in e.args[0]:
+                raise MaxAllowedSizeExceeded()
 
 
 async def get(partition_key: str, sort_key: str) -> str | None:

@@ -21,6 +21,8 @@ class Settings(BaseSettings):
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
+    max_upload_size: int = 409_600  # 400KB
+
 
 @lru_cache()
 def get_settings() -> Settings:

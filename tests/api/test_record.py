@@ -4,6 +4,7 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from fastapi import status, Response
 from app.services import record as record_service
+from app.settings import settings
 
 
 class TestCreateOrUpdateRecord:
@@ -73,6 +74,30 @@ class TestCreateOrUpdateRecord:
                 }
             ]
         }
+
+    def test_create_payload_with_max_size(self, client: TestClient):
+        response: Response = client.post(
+            "/records/key-big-payload",
+            content="t" * settings.max_upload_size,
+        )
+
+        assert response.status_code == status.HTTP_413_REQUEST_ENTITY_TOO_LARGE
+
+    def test_create_big_json_payload(self, client: TestClient):
+        response: Response = client.post(
+            "/records/key-big-payload",
+            json={"hello": "world" * settings.max_upload_size},
+        )
+
+        assert response.status_code == status.HTTP_413_REQUEST_ENTITY_TOO_LARGE
+
+    def test_create_almost_big_json_payload(self, client: TestClient):
+        response: Response = client.post(
+            "/records/key-big-payload",
+            json={"h": "w" * (settings.max_upload_size - 9)},
+        )
+
+        assert response.status_code == status.HTTP_413_REQUEST_ENTITY_TOO_LARGE
 
 
 class TestGetRecord:
