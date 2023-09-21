@@ -78,7 +78,7 @@ class TestCreateOrUpdateRecord:
     def test_create_payload_with_max_size(self, client: TestClient):
         response: Response = client.post(
             "/records/key-big-payload",
-            content="t" * settings.max_upload_size,
+            content="t" * (settings.max_upload_size + 1),
         )
 
         assert response.status_code == status.HTTP_413_REQUEST_ENTITY_TOO_LARGE
